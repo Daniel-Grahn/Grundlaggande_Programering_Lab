@@ -23,12 +23,13 @@ def tokenize(document: list[str]):
                 letter = word[i]
                 
                 if (not valid):    
+                    token.append(word_holder)
+                    word_holder = letter
                     break
                 else:
                     word_holder+=letter
 
             # print(word, lower_word) 
-            token.append(lower_word)
         
     return token
 
