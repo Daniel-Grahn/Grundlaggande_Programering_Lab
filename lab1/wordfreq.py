@@ -1,8 +1,3 @@
-def validate_character(char):
-    valid_chars = ["qwertyuiopasdfghjklzxcvbnm,.0123456789"]
-    (letter == '.' )
-    pass
-
 def tokenize(document: list[str]):
     token = []
     for line in document:
@@ -17,7 +12,7 @@ def tokenize(document: list[str]):
             word_holder = ""
             for i in range(0, len(word)):
                 char = word[i]
-                valid = validate_character(char)
+                valid = True
                 
                 #valedering
                 letter = word[i]
