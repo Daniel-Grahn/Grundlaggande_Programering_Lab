@@ -31,8 +31,7 @@ def countWords(words:list, stopWords:list) -> dict:
   
   for word in word_set:
     if(word in stopWords):
-      continue
-    
+      continue 
     count_words_dict.setdefault(word, words.count(word))
       
 
