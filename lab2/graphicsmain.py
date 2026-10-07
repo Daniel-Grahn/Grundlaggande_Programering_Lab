@@ -3,7 +3,7 @@ from graphics import *
 
 
 class GameGraphics:
-    def __init__(self, game):
+    def __init__(self, game:Game):
         self.game = game
 
         # open the window
@@ -20,9 +20,18 @@ class GameGraphics:
     def drawCanon(self,playerNr):
         # draw the cannon
         # TODO: draw a square with the size of the cannon with the color
+        
+        # p1 = self.game.Players[0]
+        # p2 = self.game.Players[1]
+        
+        # rect = Rectangle(p1,p2)
+        # rect.setFill("red")
+        # rect.draw()
+        
         # and the position of the player with number playerNr.
         # After the drawing, return the rectangle object.
         return None
+        # return rect
 
     def drawScore(self,playerNr):
         # draw the score
