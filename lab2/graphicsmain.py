@@ -72,12 +72,10 @@ class GameGraphics:
         # TODO: If the circle for the projectile for the current player
         # is not None, undraw it!
         
-        # circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
-        # if(circle != None):
-        #    circle.undraw()
-        # else:
-        #    circle = Circle(Point(circle_X+(ball_Size),circle_Y),ball_Size)
-      
+        circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
+        if not (circle == None):
+           circle.undraw()
+       
         circle = Circle(Point(circle_X,circle_Y),ball_Size)
 
         # draw the projectile (ball/circle)
@@ -91,14 +89,16 @@ class GameGraphics:
             proj.update(1/50)
 
             # move is a function in graphics. It moves an object dx units in x direction and dy units in y direction
-            circle.move(proj.getX() - circle_X, proj.getY() - circle_Y)
+            circle.move(proj.getX() - circle_X, 
+                        proj.getY() - circle_Y
+            )
 
             circle_X = proj.getX()
             circle_Y = proj.getY()
 
             update(50)
 
-        # self.draw_projs[self.game.getCurrentPlayerNumber()] = proj
+        self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
         return proj
 
     def updateScore(self,playerNr:int):

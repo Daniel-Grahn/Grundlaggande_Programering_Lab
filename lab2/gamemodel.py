@@ -86,7 +86,7 @@ class Player:
             self.x,
             self.game.getCannonSize()/2,
             -110,
-            100
+            110
         )
 
     """ Gives the x-distance from this players cannon to a projectile. If the cannon and the projectile touch (assuming the projectile is on the ground and factoring in both cannon and projectile size) this method should return 0"""
@@ -174,7 +174,8 @@ class Projectile:
         
     """ A projectile is moving as long as it has not hit the ground or moved outside the xLower and xUpper limits """
     def isMoving(self):
-        return 0 < self.getY() and self.xLower < self.getX() < self.xUpper
+        return 0 < self.getY() and \
+               self.xLower < self.getX() < self.xUpper
 
     def getX(self):
         return self.xPos
