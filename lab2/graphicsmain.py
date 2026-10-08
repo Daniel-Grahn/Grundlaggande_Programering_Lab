@@ -71,6 +71,13 @@ class GameGraphics:
 
         # TODO: If the circle for the projectile for the current player
         # is not None, undraw it!
+        
+        # circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
+        # if(circle != None):
+        #    circle.undraw()
+        # else:
+        #    circle = Circle(Point(circle_X+(ball_Size),circle_Y),ball_Size)
+      
         circle = Circle(Point(circle_X,circle_Y),ball_Size)
 
         # draw the projectile (ball/circle)
@@ -91,6 +98,7 @@ class GameGraphics:
 
             update(50)
 
+        # self.draw_projs[self.game.getCurrentPlayerNumber()] = proj
         return proj
 
     def updateScore(self,playerNr:int):
