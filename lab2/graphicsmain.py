@@ -20,6 +20,8 @@ class GameGraphics:
         self.draw_scores  = [self.drawScore(0), self.drawScore(1)]
         self.draw_projs   = [None, None]
 
+        self.traceCircles = []
+
     def drawCanon(self,playerNr):
         # draw the cannon
         # TODO: draw a square with the size of the cannon with the color
@@ -73,7 +75,7 @@ class GameGraphics:
         # is not None, undraw it!
         
         circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
-        if not (circle == None):
+        if circle:
            circle.undraw()
        
         circle = Circle(Point(circle_X,circle_Y),ball_Size)
@@ -89,9 +91,7 @@ class GameGraphics:
             proj.update(1/50)
 
             # move is a function in graphics. It moves an object dx units in x direction and dy units in y direction
-            circle.move(proj.getX() - circle_X, 
-                        proj.getY() - circle_Y
-            )
+            circle.move(proj.getX() - circle_X, proj.getY() - circle_Y)
 
             circle_X = proj.getX()
             circle_Y = proj.getY()
@@ -112,21 +112,26 @@ class GameGraphics:
         text.setText(f"Score: {new_score}")
         text.draw(self.win)
 
-    def play(self):
+    def play(self, prev_inp=None):
         while True:
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
 
             # InputDialog(self, angle, vel, wind) is a class in gamegraphics
-            inp = InputDialog(oldAngle,oldVel,wind)
+            inp = InputDialog(oldAngle,oldVel,wind) if prev_inp is None else prev_inp
             # interact(self) is a function inside InputDialog. It runs a loop until the user presses either the quit or fire button
-            if inp.interact() == "Fire!": 
-                angle, vel = inp.getValues()
-                inp.close()
-            elif inp.interact() == "Quit":
+            if inp.interact() == "Quit":
                 exit()
-            
+            elif inp.interact() == "Trace":
+                angle,vel = inp.getValues()
+                self.removeTrace()
+                self.drawTrace(angle,vel)
+                oldAngle,oldVel = angle,vel
+                self.play(inp)
+            self.removeTrace()
+            inp.close()
+            angle, vel = inp.getValues()
             player = self.game.getCurrentPlayer()
             other = self.game.getOtherPlayer()
             proj = self.fire(angle, vel)
@@ -138,7 +143,34 @@ class GameGraphics:
                 self.game.newRound()
 
             self.game.nextPlayer()
+            prev_inp = None
 
+    def drawTrace(self, angle, velocity, dots=100, timestep=3):
+        player = self.game.getCurrentPlayer()
+        trace = player.fire(angle,velocity)
+        ball_Size = self.game.getBallSize()
+
+        for _ in range(dots):
+            trace_x = trace.getX()
+            trace_y = trace.getY()
+            circle = Circle(Point(trace_x,trace_y),ball_Size//3)
+            self.traceCircles.append(circle)
+
+            circle.setFill(player.getColor())
+            circle.setOutline(player.getColor())
+            circle.draw(self.win)
+            circle_X = trace.getX()
+            circle_Y = trace.getY()
+
+            if circle_Y == 0 or circle_X <= trace.xLower or circle_X >= trace.xUpper:
+                break
+
+            circle.move(trace.getX() - circle_X, trace.getY() - circle_Y)
+
+            trace.update(1/timestep)
+    def removeTrace(self):
+        for Circle in self.traceCircles:
+            Circle.undraw()
 
 class InputDialog:
     def __init__ (self, angle, vel, wind):
@@ -156,10 +188,12 @@ class InputDialog:
         self.height = Text(Point(3,3), 5).draw(win)
         self.height.setText("{0:.2f}".format(wind))
         
-        self.fire = Button(win, Point(1,4), 1.25, .5, "Fire!")
+        self.fire = Button(win, Point(1,4), 0.9, .5, "Fire!")
         self.fire.activate()
-        self.quit = Button(win, Point(3,4), 1.25, .5, "Quit")
+        self.quit = Button(win, Point(3,4), 0.9, .5, "Quit")
         self.quit.activate()
+        self.trace = Button(win, Point(2,4), 0.9, .5, "Trace")
+        self.trace.activate()
 
     def interact(self):
         while True:
@@ -168,6 +202,8 @@ class InputDialog:
                 return "Quit"
             if self.fire.clicked(pt):
                 return "Fire!"
+            if self.trace.clicked(pt):
+                return "Trace"
 
     def getValues(self):
         a = float(self.angle.getText())
