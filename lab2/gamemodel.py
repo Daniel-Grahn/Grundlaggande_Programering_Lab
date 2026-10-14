@@ -67,7 +67,7 @@ class Player:
 
         self.score = 0 
         self.angle = 45
-        self.velocity = 40
+        self.velocity = 42
     
     """ Create and return a projectile starting at the centre of this players cannon. Replaces any previous projectile for this player. """
     def fire(self, angle, velocity):
@@ -92,12 +92,21 @@ class Player:
     """ Gives the x-distance from this players cannon to a projectile. If the cannon and the projectile touch (assuming the projectile is on the ground and factoring in both cannon and projectile size) this method should return 0"""
     def projectileDistance(self, proj):
         distance = abs(self.x - proj.getX())
-
+        distanceY = abs(0 - proj.getY())
+        print(f'dx: {distance}, distanceY: {distanceY}')
         #touchingDistance använder skillnaden på 'radien' på både kanonen och bollen. 
         #Anledningen till att vi inte också dividerar getBallSize() med två, är för att getBallSize() returnerar en radie, inte diameter.
         touchingDistance = (self.game.getCannonSize() / 2 + self.game.getBallSize())
 
-        return not (distance <= touchingDistance) 
+        return not (distance <= touchingDistance and distanceY <= touchingDistance) 
+
+    def collision(self, proj):
+        dist_x = abs(self.x - proj.getX())
+        dist_y = abs(0 - proj.getY())
+        touchingDistance = (self.game.getCannonSize() / 2 + self.game.getBallSize())
+        
+        return dist_x <= touchingDistance and dist_y <= touchingDistance
+
 
     """ The current score of this player """
     def getScore(self):
@@ -168,9 +177,10 @@ class Projectile:
         self.xvel = xvel1
         
     """ A projectile is moving as long as it has not hit the ground or moved outside the xLower and xUpper limits """
-    def isMoving(self):
+    def isMoving(self, player:Player):
         return 0 < self.getY() and \
-               self.xLower < self.getX() < self.xUpper
+               self.xLower < self.getX() < self.xUpper and \
+               not player.collision(self)
 
     def getX(self):
         return self.xPos

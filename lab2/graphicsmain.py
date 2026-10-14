@@ -63,6 +63,7 @@ class GameGraphics:
         return text
 
     def fire(self, angle, vel):
+        game = self.game
         player = self.game.getCurrentPlayer()
         proj = player.fire(angle, vel)
 
@@ -87,7 +88,7 @@ class GameGraphics:
         circle.setOutline(player.getColor())
         circle.draw(self.win)
         
-        while proj.isMoving():
+        while proj.isMoving(game.getOtherPlayer()):
             proj.update(1/50)
 
             # move is a function in graphics. It moves an object dx units in x direction and dy units in y direction
@@ -113,17 +114,20 @@ class GameGraphics:
         text.draw(self.win)
 
     def play(self, prev_inp=None):
+
         while True:
+
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
 
             # InputDialog(self, angle, vel, wind) is a class in gamegraphics
             inp = InputDialog(oldAngle,oldVel,wind) if prev_inp is None else prev_inp
+            current_input = inp.interact()
             # interact(self) is a function inside InputDialog. It runs a loop until the user presses either the quit or fire button
-            if inp.interact() == "Quit":
+            if current_input == "Quit":
                 exit()
-            elif inp.interact() == "Trace":
+            elif current_input == "Trace":
                 angle,vel = inp.getValues()
                 self.removeTrace()
                 self.drawTrace(angle,vel)
@@ -138,8 +142,8 @@ class GameGraphics:
             distance = other.projectileDistance(proj)
  
             if distance == 0.0:
-                self.drawExplosion(player.getColor(), proj.getX()) 
-                self.draw_projs[self.game.getCurrentPlayerNumber()].undraw() 
+                self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
+                self.drawExplosion(player.getColor(), proj) 
                 player.increaseScore()
                 self.updateScore(self.game.getCurrentPlayerNumber())
                 self.game.newRound() 
@@ -147,41 +151,55 @@ class GameGraphics:
             self.game.nextPlayer()
             prev_inp = None
 
-    def drawTrace(self, angle, velocity, dots=100, timestep=3):
+    def drawTrace(self, angle, velocity, dots=5000, timestep=25):
         player = self.game.getCurrentPlayer()
+        other_player = self.game.getOtherPlayer()
         trace = player.fire(angle,velocity)
         ball_Size = self.game.getBallSize()
 
-        for _ in range(dots):
+        for d in range(dots):
             trace_x = trace.getX()
             trace_y = trace.getY()
             circle = Circle(Point(trace_x,trace_y),ball_Size//3)
-            self.traceCircles.append(circle)
 
-            circle.setFill(player.getColor())
-            circle.setOutline(player.getColor())
-            circle.draw(self.win)
+            if(d % 5 == 0):
+                circle.setFill(player.getColor())
+                circle.setOutline(player.getColor())
+                circle.draw(self.win)
+            
             circle_X = trace.getX()
             circle_Y = trace.getY()
 
-            if circle_Y == 0 or circle_X <= trace.xLower or circle_X >= trace.xUpper:
+            if circle_Y == 0 or circle_X <= trace.xLower or circle_X >= trace.xUpper or other_player.collision(trace):
+                if(other_player.collision(trace)):
+                    circle.undraw()
+                    rect = Text(Point(circle_X, circle_Y), "X")
+                    rect.draw(self.win)
+                    rect.setOutline("Green")
+                    rect.setFill("Green")
+                    self.traceCircles.append(rect)
+
+                self.traceCircles.append(circle)
                 break
+             
+            self.traceCircles.append(circle)
 
             circle.move(trace.getX() - circle_X, trace.getY() - circle_Y)
 
             trace.update(1/timestep)
-            update(40)
+            update(40*5)
     def removeTrace(self):
         for Circle in self.traceCircles:
             Circle.undraw()
 
-    def drawExplosion(self, color, position, granularity = 10): 
+    def drawExplosion(self, color, position: Projectile, granularity = 10): 
         ball_size = self.game.getBallSize()
         step = self.game.getCannonSize() / granularity
         for _ in range(granularity):
-            circle = Circle(Point(position, 0), ball_size )
+            circle = Circle(Point(position.getX(), position.getY()), ball_size )
             ball_size += step
-            circle.setFill(color)
+            #circle.setFill(color)
+            # circle.
             circle.setOutline(color)
             circle.draw(self.win)
             update(35)
@@ -211,14 +229,16 @@ class InputDialog:
         self.trace.activate()
 
     def interact(self):
-        while True:
-            pt = self.win.getMouse()
-            if self.quit.clicked(pt):
-                return "Quit"
-            if self.fire.clicked(pt):
-                return "Fire!"
-            if self.trace.clicked(pt):
-                return "Trace"
+        pt = self.win.getMouse()
+        
+        print("hej", pt)
+        if self.quit.clicked(pt):
+            return "Quit"
+        elif self.fire.clicked(pt):
+            return "Fire!"
+        elif self.trace.clicked(pt):
+            return "Trace"
+
 
     def getValues(self):
         a = float(self.angle.getText())
