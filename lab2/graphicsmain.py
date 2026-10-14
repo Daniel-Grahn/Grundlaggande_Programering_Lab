@@ -96,7 +96,7 @@ class GameGraphics:
             circle_X = proj.getX()
             circle_Y = proj.getY()
 
-            update(50)
+            update(200)
 
         self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
         return proj
@@ -136,11 +136,13 @@ class GameGraphics:
             other = self.game.getOtherPlayer()
             proj = self.fire(angle, vel)
             distance = other.projectileDistance(proj)
-
+ 
             if distance == 0.0:
+                self.drawExplosion(player.getColor(), proj.getX()) 
+                self.draw_projs[self.game.getCurrentPlayerNumber()].undraw() 
                 player.increaseScore()
                 self.updateScore(self.game.getCurrentPlayerNumber())
-                self.game.newRound()
+                self.game.newRound() 
 
             self.game.nextPlayer()
             prev_inp = None
@@ -168,10 +170,23 @@ class GameGraphics:
             circle.move(trace.getX() - circle_X, trace.getY() - circle_Y)
 
             trace.update(1/timestep)
+            update(40)
     def removeTrace(self):
         for Circle in self.traceCircles:
             Circle.undraw()
 
+    def drawExplosion(self, color, position, granularity = 10): 
+        ball_size = self.game.getBallSize()
+        step = self.game.getCannonSize() / granularity
+        for _ in range(granularity):
+            circle = Circle(Point(position, 0), ball_size )
+            ball_size += step
+            circle.setFill(color)
+            circle.setOutline(color)
+            circle.draw(self.win)
+            update(35)
+            circle.undraw()
+        
 class InputDialog:
     def __init__ (self, angle, vel, wind):
         self.win = win = GraphWin("Fire", 200, 300)

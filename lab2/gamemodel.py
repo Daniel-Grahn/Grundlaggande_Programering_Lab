@@ -54,7 +54,7 @@ class Game:
 
     """ Start a new round with a random wind value (-10 to +10) """
     def newRound(self):
-        self.setCurrentWind(random.random()*20-10)
+        self.setCurrentWind(random.random()*20 - 10)
         self.nextPlayer()
 
 """ Models a player """
@@ -91,18 +91,13 @@ class Player:
 
     """ Gives the x-distance from this players cannon to a projectile. If the cannon and the projectile touch (assuming the projectile is on the ground and factoring in both cannon and projectile size) this method should return 0"""
     def projectileDistance(self, proj):
-        distance = proj.getX() - self.x
+        distance = abs(self.x - proj.getX())
 
         #touchingDistance använder skillnaden på 'radien' på både kanonen och bollen. 
         #Anledningen till att vi inte också dividerar getBallSize() med två, är för att getBallSize() returnerar en radie, inte diameter.
         touchingDistance = (self.game.getCannonSize() / 2 + self.game.getBallSize())
 
-        if abs(distance) <= touchingDistance:
-            return 0
-        if distance < 0:
-            return distance + touchingDistance
-
-        return distance - touchingDistance
+        return not (distance <= touchingDistance) 
 
     """ The current score of this player """
     def getScore(self):
