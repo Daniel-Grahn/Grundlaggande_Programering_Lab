@@ -1,6 +1,6 @@
 from gamemodel import *
 from graphics import *
-
+import math 
 
 class GameGraphics:
     def __init__(self, game:Game):
@@ -133,23 +133,24 @@ class GameGraphics:
                 self.drawTrace(angle,vel)
                 oldAngle,oldVel = angle,vel
                 self.play(inp)
-            self.removeTrace()
-            inp.close()
-            angle, vel = inp.getValues()
-            player = self.game.getCurrentPlayer()
-            other = self.game.getOtherPlayer()
-            proj = self.fire(angle, vel)
-            distance = other.projectileDistance(proj)
- 
-            if distance == 0.0:
-                self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
-                self.drawExplosion(player.getColor(), proj) 
-                player.increaseScore()
-                self.updateScore(self.game.getCurrentPlayerNumber())
-                self.game.newRound() 
+            elif current_input == "Fire!":
+                self.removeTrace()
+                inp.close()
+                angle, vel = inp.getValues()
+                player = self.game.getCurrentPlayer()
+                other = self.game.getOtherPlayer()
+                proj = self.fire(angle, vel)
+                distance = other.projectileDistance(proj)
+    
+                if distance == 0.0:
+                    self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
+                    self.drawExplosion(player.getColor(), proj) 
+                    player.increaseScore()
+                    self.updateScore(self.game.getCurrentPlayerNumber())
+                    self.game.newRound() 
 
-            self.game.nextPlayer()
-            prev_inp = None
+                self.game.nextPlayer()
+                prev_inp = None
 
     def drawTrace(self, angle, velocity, dots=5000, timestep=25):
         player = self.game.getCurrentPlayer()
@@ -157,6 +158,22 @@ class GameGraphics:
         trace = player.fire(angle,velocity)
         ball_Size = self.game.getBallSize()
 
+        cannon_size = 10
+        #Logic to reverse cannon-line angle
+        use_angle = player.angle 
+        if player.isReversed:
+            use_angle = -use_angle + 180 
+
+        cannon_xpos = math.cos(math.radians(use_angle)) * cannon_size
+        cannon_ypos = math.sin(math.radians(use_angle)) * cannon_size
+
+        p1 = Point(player.getX(), self.game.getCannonSize()/2)
+        p2 = Point(p1.x + cannon_xpos, p1.y + cannon_ypos)
+
+        cannon_sketch = Line(p1, p2)
+        cannon_sketch.setFill("Black")
+        cannon_sketch.setWidth(10)   
+        cannon_drawn = False
         for d in range(dots):
             trace_x = trace.getX()
             trace_y = trace.getY()
@@ -165,7 +182,11 @@ class GameGraphics:
             if(d % 5 == 0):
                 circle.setFill(player.getColor())
                 circle.setOutline(player.getColor())
-                circle.draw(self.win)
+                circle.draw(self.win) 
+            if d < 10 and cannon_drawn == False: 
+                cannon_sketch.draw(self.win)
+                self.traceCircles.append(cannon_sketch)
+                cannon_drawn = True
             
             circle_X = trace.getX()
             circle_Y = trace.getY()
@@ -188,9 +209,11 @@ class GameGraphics:
 
             trace.update(1/timestep)
             update(40*5)
+            
     def removeTrace(self):
         for Circle in self.traceCircles:
             Circle.undraw()
+            
 
     def drawExplosion(self, color, position: Projectile, granularity = 10): 
         ball_size = self.game.getBallSize()
