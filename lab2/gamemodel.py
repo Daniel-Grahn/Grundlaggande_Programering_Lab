@@ -29,6 +29,10 @@ class Game:
     def getBallSize(self):
         return self.ballSize
 
+    def increaseBallSize(self):
+        doubleSize = self.ballSize * 2
+        return doubleSize
+
     """ The current player, i.e. the player whose turn it is """
     def getCurrentPlayer(self):
         return self.Players[self.currentPlayer]

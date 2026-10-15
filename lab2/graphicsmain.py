@@ -102,6 +102,43 @@ class GameGraphics:
         self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
         return proj
 
+    def projectileExplosion(self, COUNT = 0):
+            
+        ball_Size = self.game.getBallSize()
+        explosion = ball_Size * 10
+        circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
+        center = circle.getCenter()
+        circle.undraw()
+
+        for _ in range(explosion):
+            resize = COUNT + 1
+            ball_Size += resize
+
+            circle = Circle(center, ball_Size)
+            
+
+            circle.setFill("yellow")
+            circle.setOutline("yellow")
+            circle.draw(self.win)
+            update(60)
+            circle.undraw()
+
+        for _ in range(explosion):
+            resize = COUNT + 1
+            explosion -= resize
+
+            circle = Circle(center, explosion)
+            
+
+            circle.setFill("yellow")
+            circle.setOutline("yellow")
+            circle.draw(self.win)
+            update(60)
+            circle.undraw()
+
+    
+        self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
+
     def updateScore(self,playerNr:int):
         # update the score on the screen
         # TODO: undraw the old text, create and draw a new text
@@ -143,8 +180,7 @@ class GameGraphics:
                 distance = other.projectileDistance(proj)
     
                 if distance == 0.0:
-                    self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
-                    self.drawExplosion(player.getColor(), proj) 
+                    self.projectileExplosion()
                     player.increaseScore()
                     self.updateScore(self.game.getCurrentPlayerNumber())
                     self.game.newRound() 
@@ -214,19 +250,6 @@ class GameGraphics:
         for Circle in self.traceCircles:
             Circle.undraw()
             
-
-    def drawExplosion(self, color, position: Projectile, granularity = 10): 
-        ball_size = self.game.getBallSize()
-        step = self.game.getCannonSize() / granularity
-        for _ in range(granularity):
-            circle = Circle(Point(position.getX(), position.getY()), ball_size )
-            ball_size += step
-            #circle.setFill(color)
-            # circle.
-            circle.setOutline(color)
-            circle.draw(self.win)
-            update(35)
-            circle.undraw()
         
 class InputDialog:
     def __init__ (self, angle, vel, wind):
