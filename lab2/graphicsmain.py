@@ -137,7 +137,7 @@ class GameGraphics:
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
-            inp = InputDialog(oldAngle,oldVel,wind, "cyan") if prev_inp is None else prev_inp  
+            inp = InputDialog(oldAngle,oldVel,wind, "turquoise") if prev_inp is None else prev_inp  
  
             current_input = inp.interact()  
             if self.win.isClosed() or current_input == "Quit":
