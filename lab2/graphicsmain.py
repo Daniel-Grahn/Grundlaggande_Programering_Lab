@@ -137,7 +137,7 @@ class GameGraphics:
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
-            inp = InputDialog(oldAngle,oldVel,wind, color_rgb(40,40,100)) if prev_inp is None else prev_inp  
+            inp = InputDialog(oldAngle,oldVel,wind, "cyan") if prev_inp is None else prev_inp  
  
             current_input = inp.interact()  
             if self.win.isClosed() or current_input == "Quit":
@@ -199,8 +199,8 @@ class GameGraphics:
                     circle.undraw()
                     rect = Text(Point(circle_X, circle_Y), "X")
                     rect.draw(self.win)
-                    rect.setOutline("Green")
-                    rect.setFill("Green")
+                    rect.setOutline("yellow")
+                    rect.setFill("yellow")
                     self.traceCircles.append(rect)
 
                 self.traceCircles.append(circle)
