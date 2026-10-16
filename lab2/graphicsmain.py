@@ -162,8 +162,7 @@ class GameGraphics:
                 self.updateCannon(angle)
                 player = self.game.getCurrentPlayer()
                 other = self.game.getOtherPlayer()
-                proj = self.fire(angle, vel)
-                distance = other.projectileDistance(proj)
+                proj = self.fire(angle, vel) 
 
                 if other.collision(proj): 
                     self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
