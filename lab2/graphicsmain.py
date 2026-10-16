@@ -7,6 +7,7 @@ class GameGraphics:
         self.game = game 
         # open the window
         self.win = GraphWin("Cannon game" , 640, 480, autoflush=False)
+        self.win.setBackground(color_rgb(50,180,50))
         self.win.setCoords(-110, -10, 110, 155)
         
         # draw the terrain 
@@ -136,7 +137,7 @@ class GameGraphics:
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
-            inp = InputDialog(oldAngle,oldVel,wind) if prev_inp is None else prev_inp  
+            inp = InputDialog(oldAngle,oldVel,wind, color_rgb(40,40,100)) if prev_inp is None else prev_inp  
  
             current_input = inp.interact()  
             if self.win.isClosed() or current_input == "Quit":
@@ -231,8 +232,9 @@ class GameGraphics:
             circle.undraw()
         
 class InputDialog:
-    def __init__ (self, angle, vel, wind):
-        self.win = win = GraphWin("Fire", 200, 300)
+    def __init__ (self, angle, vel, wind, col):
+        self.win = win = GraphWin("Fire", 200, 300)  
+        self.win.setBackground(col)
         win.setCoords(0,4.5,4,.5)
         Text(Point(1,1), "Angle").draw(win)
         self.angle = Entry(Point(3,1), 5).draw(win)
