@@ -177,11 +177,15 @@ class Projectile:
         self.xvel = xvel1
         
     """ A projectile is moving as long as it has not hit the ground or moved outside the xLower and xUpper limits """
-    def isMoving(self, player:Player):
-        return 0 < self.getY() and \
-               self.xLower < self.getX() < self.xUpper and \
-               not player.collision(self)
+    def isMoving(self, player:Player=None):
+        test_check = 0 < self.getY() and \
+               self.xLower < self.getX() < self.xUpper
 
+        if player == None:
+            return test_check 
+        else:
+            return test_check and not player.collision(self)   
+        
     def getX(self):
         return self.xPos
 
