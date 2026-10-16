@@ -4,14 +4,12 @@ import math
 
 class GameGraphics:
     def __init__(self, game:Game):
-        self.game = game
-
+        self.game = game 
         # open the window
         self.win = GraphWin("Cannon game" , 640, 480, autoflush=False)
         self.win.setCoords(-110, -10, 110, 155)
         
-        # draw the terrain
-        # TODO: Draw a line from (-110,0) to (110,0)
+        # draw the terrain 
         self.line = Line(Point(-110,0),Point(110,0))
         self.line.setFill("black")
         self.line.draw(self.win)
@@ -20,9 +18,7 @@ class GameGraphics:
         self.draw_scores  = [self.drawScore(0), self.drawScore(1)]
         self.draw_projs   = [None, None]
 
-        self.traceCircles = []
-
-
+        self.traceCircles = [] 
     
     def drawCannon(self, playerNr, angle=None):
         player = self.game.getPlayers()[playerNr]
@@ -30,8 +26,7 @@ class GameGraphics:
 
         if angle is None:
             angle = player.getAim()[0]
-
-        # Draw the colored square
+ 
         center_Xpos = player.getX()
         p1 = Point(center_Xpos - canon_size / 2, 0)
         p2 = Point(center_Xpos + canon_size / 2, canon_size)
@@ -41,7 +36,7 @@ class GameGraphics:
         rect.setOutline(player.getColor())
         rect.draw(self.win)
 
-        # Draw the black barrel
+        # adjusting angle for barrel based on isReversed
         if player.isReversed:
             angle = 180 - angle
 
@@ -86,18 +81,11 @@ class GameGraphics:
         self.draw_cannons[playerNr] = (rect, new_barrel)
 
 
-    def drawScore(self,playerNr):
-        # draw the score
-        # TODO: draw the text "Score: X", where X is the number of points
-        # for player number playerNr. The text should be placed under
-        # the corresponding cannon. After the drawing,
-        # return the text object.
-        
+    def drawScore(self,playerNr): 
         player = self.game.getPlayers()[playerNr]
-        score = player.getScore()
-        
-        center_Xpos = player.getX()        
-        
+        score = player.getScore() 
+        center_Xpos = player.getX()   
+
         text = Text(Point(center_Xpos, -5), f"Score: {score}")
         text.setFill("black")
         text.draw(self.win)
@@ -270,7 +258,7 @@ class InputDialog:
             pt = self.win.getMouse()   
         except:
             exit()
-            
+
         if self.quit.clicked(pt):
             return "Quit"
         elif self.fire.clicked(pt):
