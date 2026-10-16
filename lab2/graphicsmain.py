@@ -113,27 +113,28 @@ class GameGraphics:
         text.setText(f"Score: {new_score}")
         text.draw(self.win)
 
-    def play(self, prev_inp=None):
-
-        while True:
-
+    def play(self, prev_inp=None): 
+        prev_inp = None
+        while True:     
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
-
-            # InputDialog(self, angle, vel, wind) is a class in gamegraphics
-            inp = InputDialog(oldAngle,oldVel,wind) if prev_inp is None else prev_inp
-            current_input = inp.interact()
-            # interact(self) is a function inside InputDialog. It runs a loop until the user presses either the quit or fire button
-            if current_input == "Quit":
-                exit()
+            inp = InputDialog(oldAngle,oldVel,wind) if prev_inp is None else prev_inp  
+ 
+            current_input = inp.interact()  
+            if self.win.isClosed() or current_input == "Quit":
+                exit() 
             elif current_input == "Trace":
+                inp.close()
+                prev_inp = None
                 angle,vel = inp.getValues()
                 self.removeTrace()
                 self.drawTrace(angle,vel)
                 oldAngle,oldVel = angle,vel
-                self.play(inp)
+                self.play(inp) 
             elif current_input == "Fire!":
+                inp.close()
+                prev_inp = None
                 self.removeTrace()
                 inp.close()
                 angle, vel = inp.getValues()
@@ -149,8 +150,9 @@ class GameGraphics:
                     self.updateScore(self.game.getCurrentPlayerNumber())
                     self.game.newRound() 
 
-                self.game.nextPlayer()
-                prev_inp = None
+                self.game.nextPlayer() 
+            else: 
+                prev_inp = inp 
 
     def drawTrace(self, angle, velocity, dots=5000, timestep=25):
         player = self.game.getCurrentPlayer()
@@ -168,8 +170,8 @@ class GameGraphics:
         cannon_ypos = math.sin(math.radians(use_angle)) * cannon_size
 
         p1 = Point(player.getX(), self.game.getCannonSize()/2)
-        p2 = Point(p1.x + cannon_xpos, p1.y + cannon_ypos)
-
+        p2 = Point(p1.x + cannon_xpos, p1.y + cannon_ypos) 
+        
         cannon_sketch = Line(p1, p2)
         cannon_sketch.setFill("Black")
         cannon_sketch.setWidth(10)   
@@ -251,10 +253,8 @@ class InputDialog:
         self.trace = Button(win, Point(2,4), 0.9, .5, "Trace")
         self.trace.activate()
 
-    def interact(self):
-        pt = self.win.getMouse()
-        
-        print("hej", pt)
+    def interact(self): 
+        pt = self.win.getMouse()   
         if self.quit.clicked(pt):
             return "Quit"
         elif self.fire.clicked(pt):

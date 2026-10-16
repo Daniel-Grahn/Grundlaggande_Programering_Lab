@@ -92,8 +92,7 @@ class Player:
     """ Gives the x-distance from this players cannon to a projectile. If the cannon and the projectile touch (assuming the projectile is on the ground and factoring in both cannon and projectile size) this method should return 0"""
     def projectileDistance(self, proj):
         distance = abs(self.x - proj.getX())
-        distanceY = abs(0 - proj.getY())
-        print(f'dx: {distance}, distanceY: {distanceY}')
+        distanceY = abs(0 - proj.getY()) 
         #touchingDistance använder skillnaden på 'radien' på både kanonen och bollen. 
         #Anledningen till att vi inte också dividerar getBallSize() med två, är för att getBallSize() returnerar en radie, inte diameter.
         touchingDistance = (self.game.getCannonSize() / 2 + self.game.getBallSize())
