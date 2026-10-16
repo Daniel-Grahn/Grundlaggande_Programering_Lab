@@ -164,8 +164,8 @@ class GameGraphics:
                 other = self.game.getOtherPlayer()
                 proj = self.fire(angle, vel)
                 distance = other.projectileDistance(proj)
-    
-                if distance == 0.0:
+
+                if other.collision(proj): 
                     self.draw_projs[self.game.getCurrentPlayerNumber()].undraw()
                     self.drawExplosion(player.getColor(), proj) 
                     player.increaseScore()
