@@ -176,7 +176,7 @@ class GameGraphics:
             else: 
                 prev_inp = inp 
  
-    def drawTrace(self, angle, velocity, dots=5000, timestep=25):
+    def drawTrace(self, angle, velocity, dots=1000, timestep=25):
         player = self.game.getCurrentPlayer()
         other_player = self.game.getOtherPlayer()
         trace = player.fire(angle,velocity)
@@ -186,7 +186,7 @@ class GameGraphics:
             trace_y = trace.getY()
             circle = Circle(Point(trace_x,trace_y),ball_Size//3)
 
-            if(d % 5 == 0):
+            if(d > 8 and d % 5 == 0):
                 circle.setFill(player.getColor())
                 circle.setOutline(player.getColor())
                 circle.draw(self.win)  
