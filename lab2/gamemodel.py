@@ -130,15 +130,7 @@ class Player:
 
 
 """ Models a projectile (a cannonball, but could be used more generally) """
-class Projectile:
-    """
-        Constructor parameters:
-        angle and velocity: the initial angle and velocity of the projectile 
-            angle 0 means straight east (positive x-direction) and 90 straight up
-        wind: The wind speed value affecting this projectile
-        xPos and yPos: The initial position of this projectile
-        xLower and xUpper: The lowest and highest x-positions allowed
-    """
+class Projectile: 
     def __init__(self, angle, velocity, wind, xPos, yPos, xLower, xUpper):
         self.yPos = yPos
         self.xPos = xPos
@@ -147,14 +139,8 @@ class Projectile:
         theta = radians(angle)
         self.xvel = velocity*cos(theta)
         self.yvel = velocity*sin(theta)
-        self.wind = wind
-
-
-    """ 
-        Advance time by a given number of seconds
-        (typically, time is less than a second, 
-         for large values the projectile may move erratically)
-    """
+        self.wind = wind 
+        
     def update(self, time):
         # Compute new velocity based on acceleration from gravity/wind
         yvel1 = self.yvel - 9.8*time
@@ -190,4 +176,4 @@ class Projectile:
 
     """ The current y-position (height) of the projectile". Should never be below 0. """
     def getY(self):
-        return self.yPos
+        return max(self.yPos, 0)

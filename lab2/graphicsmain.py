@@ -16,33 +16,75 @@ class GameGraphics:
         self.line.setFill("black")
         self.line.draw(self.win)
 
-        self.draw_cannons = [self.drawCanon(0), self.drawCanon(1)]
+        self.draw_cannons = [self.drawCannon(0), self.drawCannon(1)]
         self.draw_scores  = [self.drawScore(0), self.drawScore(1)]
         self.draw_projs   = [None, None]
 
         self.traceCircles = []
 
-    def drawCanon(self,playerNr):
-        # draw the cannon
-        # TODO: draw a square with the size of the cannon with the color
-        
+
+    
+    def drawCannon(self, playerNr, angle=None):
         player = self.game.getPlayers()[playerNr]
         canon_size = self.game.getCannonSize()
-        
+
+        if angle is None:
+            angle = player.getAim()[0]
+
+        # Draw the colored square
         center_Xpos = player.getX()
-        
-        p1 = Point(center_Xpos - (canon_size//2), 0)
-        p2 = Point(center_Xpos + (canon_size//2), canon_size)
-        
-        
-        rect = Rectangle(p1,p2)
+        p1 = Point(center_Xpos - canon_size / 2, 0)
+        p2 = Point(center_Xpos + canon_size / 2, canon_size)
+
+        rect = Rectangle(p1, p2)
         rect.setFill(player.getColor())
         rect.setOutline(player.getColor())
         rect.draw(self.win)
-        
-        # and the position of the player with number playerNr.
-        # After the drawing, return the rectangle object.
-        return rect
+
+        # Draw the black barrel
+        if player.isReversed:
+            angle = 180 - angle
+
+        barrel_length = 10
+        dx = math.cos(math.radians(angle)) * barrel_length
+        dy = math.sin(math.radians(angle)) * barrel_length
+
+        start = Point(center_Xpos, canon_size / 2)
+        end = Point(start.x + dx, start.y + dy)
+
+        barrel = Line(start, end)
+        barrel.setFill("black")
+        barrel.setWidth(10)
+        barrel.draw(self.win)
+
+        return rect, barrel
+
+    
+    def updateCannon(self, angle, playerNr=None):
+        if playerNr is None:
+            playerNr = self.game.getCurrentPlayerNumber()
+
+        rect, old_barrel = self.draw_cannons[playerNr] 
+        old_barrel.undraw() 
+
+        player = self.game.getPlayers()[playerNr] 
+        if player.isReversed:
+            angle = 180 - angle
+
+        barrel_length = 10
+        dx = math.cos(math.radians(angle)) * barrel_length
+        dy = math.sin(math.radians(angle)) * barrel_length
+
+        start = Point(player.getX(), self.game.getCannonSize() / 2)
+        end = Point(start.x + dx, start.y + dy)
+
+        new_barrel = Line(start, end)
+        new_barrel.setFill("black")
+        new_barrel.setWidth(10)
+        new_barrel.draw(self.win)
+
+        self.draw_cannons[playerNr] = (rect, new_barrel)
+
 
     def drawScore(self,playerNr):
         # draw the score
@@ -65,51 +107,38 @@ class GameGraphics:
     def fire(self, angle, vel):
         game = self.game
         player = self.game.getCurrentPlayer()
-        proj = player.fire(angle, vel)
-
+        proj = player.fire(angle, vel) 
         circle_X = proj.getX()
-        circle_Y = proj.getY()
-        
-        ball_Size = self.game.getBallSize()
+        circle_Y = proj.getY() 
+        ball_Size = self.game.getBallSize() 
 
-        # TODO: If the circle for the projectile for the current player
-        # is not None, undraw it!
-        
         circle:Circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
         if circle:
-           circle.undraw()
-       
+           circle.undraw() 
         circle = Circle(Point(circle_X,circle_Y),ball_Size)
 
-        # draw the projectile (ball/circle)
-        # TODO: Create and draw a new circle with the coordinates of
-        # the projectile.
+        # draw the projectile (ball/circle) 
         circle.setFill(player.getColor())
         circle.setOutline(player.getColor())
         circle.draw(self.win)
         
         while proj.isMoving(game.getOtherPlayer()):
-            proj.update(1/50)
-
-            # move is a function in graphics. It moves an object dx units in x direction and dy units in y direction
+            proj.update(1/50) 
             circle.move(proj.getX() - circle_X, proj.getY() - circle_Y)
 
             circle_X = proj.getX()
-            circle_Y = proj.getY()
-
+            circle_Y = proj.getY() 
             update(200)
 
         self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
         return proj
 
-    def updateScore(self,playerNr:int):
-        # update the score on the screen
-        # TODO: undraw the old text, create and draw a new text
+    def updateScore(self,playerNr:int): 
         text:Text = self.draw_scores[playerNr]
         text.undraw()
+
         player = self.game.getPlayers()[playerNr]
-        new_score = player.getScore()
-        
+        new_score = player.getScore() 
         text.setText(f"Score: {new_score}")
         text.draw(self.win)
 
@@ -124,20 +153,24 @@ class GameGraphics:
             current_input = inp.interact()  
             if self.win.isClosed() or current_input == "Quit":
                 exit() 
+
             elif current_input == "Trace":
                 inp.close()
                 prev_inp = None
                 angle,vel = inp.getValues()
                 self.removeTrace()
+                self.updateCannon(angle)
                 self.drawTrace(angle,vel)
                 oldAngle,oldVel = angle,vel
                 self.play(inp) 
+
             elif current_input == "Fire!":
                 inp.close()
                 prev_inp = None
                 self.removeTrace()
                 inp.close()
                 angle, vel = inp.getValues()
+                self.updateCannon(angle)
                 player = self.game.getCurrentPlayer()
                 other = self.game.getOtherPlayer()
                 proj = self.fire(angle, vel)
@@ -153,29 +186,12 @@ class GameGraphics:
                 self.game.nextPlayer() 
             else: 
                 prev_inp = inp 
-
+ 
     def drawTrace(self, angle, velocity, dots=5000, timestep=25):
         player = self.game.getCurrentPlayer()
         other_player = self.game.getOtherPlayer()
         trace = player.fire(angle,velocity)
-        ball_Size = self.game.getBallSize()
-
-        cannon_size = 10
-        #Logic to reverse cannon-line angle
-        use_angle = player.angle 
-        if player.isReversed:
-            use_angle = -use_angle + 180 
-
-        cannon_xpos = math.cos(math.radians(use_angle)) * cannon_size
-        cannon_ypos = math.sin(math.radians(use_angle)) * cannon_size
-
-        p1 = Point(player.getX(), self.game.getCannonSize()/2)
-        p2 = Point(p1.x + cannon_xpos, p1.y + cannon_ypos) 
-        
-        cannon_sketch = Line(p1, p2)
-        cannon_sketch.setFill("Black")
-        cannon_sketch.setWidth(10)   
-        cannon_drawn = False
+        ball_Size = self.game.getBallSize() 
         for d in range(dots):
             trace_x = trace.getX()
             trace_y = trace.getY()
@@ -184,12 +200,8 @@ class GameGraphics:
             if(d % 5 == 0):
                 circle.setFill(player.getColor())
                 circle.setOutline(player.getColor())
-                circle.draw(self.win) 
-            if d < 10 and cannon_drawn == False: 
-                cannon_sketch.draw(self.win)
-                self.traceCircles.append(cannon_sketch)
-                cannon_drawn = True
-            
+                circle.draw(self.win)  
+
             circle_X = trace.getX()
             circle_Y = trace.getY()
 
@@ -254,7 +266,11 @@ class InputDialog:
         self.trace.activate()
 
     def interact(self): 
-        pt = self.win.getMouse()   
+        try:
+            pt = self.win.getMouse()   
+        except:
+            exit()
+            
         if self.quit.clicked(pt):
             return "Quit"
         elif self.fire.clicked(pt):
