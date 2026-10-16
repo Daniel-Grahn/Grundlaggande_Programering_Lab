@@ -7,7 +7,7 @@ class GameGraphics:
         self.game = game 
         # open the window
         self.win = GraphWin("Cannon game" , 640, 480, autoflush=False)
-        self.win.setBackground(color_rgb(50,180,50))
+        self.win.setBackground(color_rgb(50,130,50))
         self.win.setCoords(-110, -10, 110, 155)
         
         # draw the terrain 
